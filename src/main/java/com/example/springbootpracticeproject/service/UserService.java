@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.example.springbootpracticeproject.repository.UserRepository;
 
+import javax.servlet.http.HttpSession;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -14,7 +16,11 @@ public class UserService {
 
     public void registerUser(UserDto userDto) {
 
-        //id, 이메일 중복 체크 필요
+        if(userRepository.existsByUsername(userDto.getUsername()))
+            throw new IllegalArgumentException("이미 사용중인 ID입니다");
+
+        if(userRepository.existsByEmail(userDto.getEmail()))
+            throw new IllegalArgumentException("이미 등록된 이메일입니다");
 
         userRepository.save(User
                 .builder()
@@ -22,5 +28,12 @@ public class UserService {
                 .email(userDto.getEmail())
                 .password(userDto.getPassword()) //password encoding 아직 안함
                 .build());
+    }
+
+    public void login(String username, String password, HttpSession httpSession) throws IllegalAccessException {
+        if(!userRepository.existsByUsernameAndPassword(username, password)) {
+            throw new IllegalAccessException("인증 실패");
+        }
+        httpSession.setAttribute("user", userRepository.findByUsername(username));
     }
 }

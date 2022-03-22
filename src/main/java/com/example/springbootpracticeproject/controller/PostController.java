@@ -29,7 +29,7 @@ public class PostController {
         return postService.getPost(id);
     }
 
-    @GetMapping("/post")
+    @GetMapping("/posts")
     public List<PostResponseDto> getAllPost() {
         return postService.getAllPost();
     }

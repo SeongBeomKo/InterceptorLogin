@@ -4,13 +4,11 @@ import com.example.springbootpracticeproject.dto.UserDto;
 import com.example.springbootpracticeproject.exception.InputValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import com.example.springbootpracticeproject.service.UserService;
 
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,5 +23,19 @@ public class UserController {
         //유효성 검사 실패 시 exception resolver에서 상태코드를 400으로 바꿔서 메시지와 함께 내려준다
         InputValidator.BadRequestHandler(bindingResult);
         userService.registerUser(userDto);
+    }
+
+    @PostMapping("/login")
+    public String login(@RequestParam("username") String username,
+                        @RequestParam("password") String password,
+                        HttpSession httpSession) throws IllegalAccessException {
+        userService.login(username, password, httpSession);
+        return "login";
+    }
+
+    @GetMapping("/logout")
+    public String logout(HttpSession httpSession) {
+        httpSession.invalidate();
+        return "logout";
     }
 }

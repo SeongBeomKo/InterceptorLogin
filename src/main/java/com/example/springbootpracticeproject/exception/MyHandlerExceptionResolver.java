@@ -62,11 +62,13 @@ public class MyHandlerExceptionResolver implements HandlerExceptionResolver {
                    // return new ModelAndView("error/400");
              //   }
             }
+
             if(ex instanceof NullPointerException) {
                 log.info("MyHanderExceptionResolver resolved 404 Not Found");
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 return new ModelAndView();
             }
+
         } catch (IOException e) {
             log.error("other error", e);
         }

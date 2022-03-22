@@ -2,14 +2,11 @@ package com.example.springbootpracticeproject.exception;
 
 import com.example.springbootpracticeproject.controller.UserController;
 import lombok.extern.slf4j.Slf4j;
-import org.omg.CORBA.UserException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -25,29 +22,27 @@ public class ApiControllerAdvice {
                                          HttpServletResponse response,
                                          IllegalArgumentException e) {
         log.info("illegalExResolver Start!");
-        //System.out.println(request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE));
         return new ErrorResult(HttpStatus.BAD_REQUEST,
                 e.getMessage());
     }
 
-
-    //@ExceptionHandler를 사용할 때는 @ResponseStatus는 BasicErrorController로
-    // 넘어가게 처리를 하지는 않는다.
-    //이유는 @ExceptionHandler가 스프링이 등록해주는 HandlerExceptionResolver 중에서
-    // 더 높은 우선순위를 가지고 동작하기 때문이다.
-    @ExceptionHandler
-    public ResponseEntity<ErrorResult> userExResolver(HttpServletRequest request,
-                                                      HttpServletResponse response,
-                                                      UserException exception) {
-        ErrorResult errorResult = new ErrorResult(
-                HttpStatus.BAD_REQUEST,
-                exception.getMessage());
-        return new ResponseEntity<>(errorResult, HttpStatus.NOT_FOUND);
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(IllegalAccessException.class)
+    public ErrorResult illegalAccessResolver(HttpServletRequest request,
+                                         HttpServletResponse response,
+                                         IllegalArgumentException e) {
+        log.info("illegal Access Resolver Start!");
+        return new ErrorResult(HttpStatus.UNAUTHORIZED,
+                e.getMessage());
     }
 
     // messages.properties에서 reason과 동일하게 맵핑되는 값을 찾는다. → 있으면 출력
     // 없으면 error.bad 그 자체를 출력한다.
     @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "error.bad")
     public class BadRequestException extends RuntimeException{
+    }
+
+    @ResponseStatus(value = HttpStatus.UNAUTHORIZED, reason = "error.bad")
+    public class IllegalAccessException extends RuntimeException{
     }
 }
